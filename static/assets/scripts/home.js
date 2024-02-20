@@ -8,7 +8,7 @@ try {
 
 if (!inFrame && !navigator.userAgent.includes('Firefox')) {
   const popup = open('about:blank', '_blank')
-  if (!popup || popup.closed) alert('Please allow popups and redirects.')
+  if (!popup || popup.closed) alert('Please allow popups.')
   else {
     const doc = popup.document
     const iframe = doc.createElement('iframe')
@@ -30,7 +30,7 @@ if (!inFrame && !navigator.userAgent.includes('Firefox')) {
 
     doc.head.appendChild(link)
     doc.body.appendChild(iframe)
-    location.replace(localStorage.getItem('panicLink') || 'https://www.nasa.gov/')
+    window.close()
   }
 }
 
