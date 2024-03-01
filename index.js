@@ -27,6 +27,8 @@ const routes = [
   { path: '/!', file: 'settings.html' },
   { path: '/0', file: 'tabs.html' },
   { path: '/1', file: 'go.html' },
+  { path: '/3237', file: 'about.html' },
+  { path: '/404', file: '404.html' },
 ]
 
 const fetchData = async (req, res, next, baseUrl) => {
