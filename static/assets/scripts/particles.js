@@ -1,7 +1,20 @@
+// NEW: Adaptive particles
+
+function getParticleCount() {
+  const width = window.innerWidth;
+  if (width < 768) {
+    return 50;
+  } else if (width < 1200) {
+    return 100;
+  } else {
+    return 200;
+  }
+}
+
 particlesJS('particles-js', {
   particles: {
     number: {
-      value: 200,
+      value: getParticleCount(),
       density: {
         enable: true,
         value_area: 600,
@@ -107,4 +120,14 @@ particlesJS('particles-js', {
     },
   },
   retina_detect: true,
-})
+});
+
+window.addEventListener('resize', () => {
+  particlesJS('particles-js', { 
+    particles: { 
+       number: { 
+          value: getParticleCount() 
+       } 
+     } 
+   });
+});
