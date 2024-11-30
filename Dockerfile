@@ -1,4 +1,4 @@
-FROM node:iron-bookworm-slim
+FROM node:20.15.0-slim
 ENV NODE_ENV=production
 
 WORKDIR /app
