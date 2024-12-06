@@ -21,6 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     // idk why brain test on poki doesnt work when i take out everything after "index.html?" so i left it there, usually it works without it tho
     {
+      name: 'SUPREM.IO',
+      link: 'https://suprem.io/',
+      image: 'https://i.ibb.co/rpvB85Y/download.jpg',
+      categories: ['all'],
+    },
+    {
       name: 'Brain Test',
       link: 'https://0322484b-7a58-4454-9667-f805afffded5.poki-gdn.com/84b4bd8a-22b6-402f-82c2-36fc00e1d1a2/index.html?country=US&ccpaApplies=0&url_referrer=https%3A%2F%2Fpoki.com%2F&tag=pg-82e8f2dc154b5bb6dce1b8b3b3c12da92d19df12&site_id=3&iso_lang=en&poki_url=https%3A%2F%2Fpoki.com%2Fen%2Fg%2Fbrain-test-tricky-puzzles&hoist=yes&nonPersonalized=n&familyFriendly=n&categories=7%2C16%2C37%2C72%2C96%2C400%2C832%2C843%2C1137%2C1140%2C1141%2C1150%2C1159%2C1190%2C1193&special_condition=crosspromo&game_id=0322484b-7a58-4454-9667-f805afffded5&game_version_id=84b4bd8a-22b6-402f-82c2-36fc00e1d1a2&inspector=0&csp=1',
       image: '/assets/media/icons/braintest.webp',
