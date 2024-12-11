@@ -19,12 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
       categories: ['all', 'emu', 'android'],
     },
     {
-      name: 'Temu',
-      link: 'https://temu.com',
-      image: '/assets/media/icons/temu.webp',
-      categories: ['all'],
-    },
-    {
       name: 'Character AI',
       link: 'https://now.gg/iframe/snippet?app_pkg=ai.character.app&partner=interstellar',
       image: '/assets/media/icons/characterai.webp',
