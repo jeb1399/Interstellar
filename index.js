@@ -1,11 +1,13 @@
-import express from 'express'
-import basicAuth from 'express-basic-auth'
-import http from 'node:http'
-import { createBareServer } from '@tomphttp/bare-server-node'
-import path from 'node:path'
-import cors from 'cors'
-import config from './config.js'
-
+import express from 'express';
+import basicAuth from 'express-basic-auth';
+import http from 'node:http';
+import { createBareServer } from '@tomphttp/bare-server-node';
+import path from 'node:path';
+import cors from 'cors';
+import fs from 'fs/promises';
+import fetch from 'node-fetch';
+import mime from 'mime-types';
+import config from './config.js';
 const __dirname = process.cwd();
 const server = http.createServer();
 const app = express(server);
@@ -13,9 +15,7 @@ const bareServer = createBareServer('/v/');
 const PORT = process.env.PORT || 8080;
 
 if (config.challenge) {
-    console.log('Password protection is enabled. Usernames are: ' + Object.keys(config.users));
-    console.log('Passwords are: ' + Object.values(config.users));
-    app.use(basicAuth(config));
+  app.use(basicAuth(config));
 }
 
 app.use(express.json());
@@ -24,74 +24,93 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'static')));
 
 const routes = [
-    { path: '/', file: 'index.html' },
-    { path: '/~', file: 'apps.html' },
-    { path: '/-', file: 'games.html' },
-    { path: '/!', file: 'settings.html' },
-    { path: '/0', file: 'tabs.html' },
-    { path: '/1', file: 'go.html' },
-    { path: '/2', file: 'other.html' },
-    { path: '/404', file: '404.html' },
+  { path: '/', file: 'index.html' },
+  { path: '/~', file: 'apps.html' },
+  { path: '/-', file: 'games.html' },
+  { path: '/!', file: 'settings.html' },
+  { path: '/0', file: 'tabs.html' },
+  { path: '/1', file: 'go.html' },
+  { path: '/2', file: 'other.html' },
+  { path: '/404', file: '404.html' },
 ];
 
 const fetchData = async (req, res, next, baseUrl) => {
-    try {
-        const reqTarget = `${baseUrl}/${req.params[0]}`;
-        const asset = await fetch(reqTarget);
-
-        if (asset.ok) {
-            const data = await asset.arrayBuffer();
-            res.end(Buffer.from(data));
-        } else {
-            next();
-        }
-    } catch (error) {
-        console.error('Error fetching:', error);
-        next(error);
+  const reqTarget = `${baseUrl}/${req.params[0]}`;
+  try {
+    const asset = await fetch(reqTarget);
+    if (asset.ok) {
+      const data = await asset.arrayBuffer();
+      res.end(Buffer.from(data));
+    } else {
+      next();
     }
+  } catch {
+    next();
+  }
 };
 
 app.get('/y/*', cors({ origin: false }), (req, res, next) => {
-    const baseUrl = 'https://raw.githubusercontent.com/ypxa/y/main';
-    fetchData(req, res, next, baseUrl);
+  fetchData(req, res, next, 'https://raw.githubusercontent.com/ypxa/y/main');
 });
 
 app.get('/f/*', cors({ origin: false }), (req, res, next) => {
-    const baseUrl = 'https://raw.githubusercontent.com/4x-a/x/fixy';
-    fetchData(req, res, next, baseUrl);
+  fetchData(req, res, next, 'https://raw.githubusercontent.com/4x-a/x/fixy');
 });
 
-routes.forEach((route) => {
-    app.get(route.path, (req, res) => {
-        res.sendFile(path.join(__dirname, 'static', route.file));
+routes.forEach(route => {
+  app.get(route.path, (req, res) => {
+    res.sendFile(path.join(__dirname, 'static', route.file));
+  });
+});
+
+app.get('/m/uv/*', async (req, res) => {
+  const filePath = path.join(process.cwd(), req.url);
+  try {
+    const content = await fs.readFile(filePath);
+    const mimeType = mime.lookup(filePath) || 'application/octet-stream';
+    res.setHeader('Content-Type', mimeType);
+    res.end(content);
+  } catch {
+    res.status(404).end('File not found');
+  }
+});
+
+app.get('/m/bare/*', async (req, res) => {
+  const bareUrl = req.url.slice('/m/bare/'.length);
+  try {
+    const response = await fetch(bareUrl, {
+      method: req.method,
+      headers: req.headers,
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? req : undefined,
     });
-});
-
-app.get('/robots.txt', (req, res) => {
-    res.type('text/plain');
-    res.send('User-agent: *\nDisallow: /');
+    res.status(response.status);
+    response.headers.forEach((value, key) => {
+      if (!['set-cookie', 'transfer-encoding'].includes(key.toLowerCase())) {
+        res.setHeader(key, value);
+      }
+    });
+    response.body.pipe(res);
+  } catch {
+    res.status(500).end('Error proxying request');
+  }
 });
 
 server.on('request', (req, res) => {
-    if (bareServer.shouldRoute(req)) {
-        bareServer.routeRequest(req, res);
-    } else {
-        app(req, res);
-    }
+  if (bareServer.shouldRoute(req)) {
+    bareServer.routeRequest(req, res);
+  } else {
+    app(req, res);
+  }
 });
 
 server.on('upgrade', (req, socket, head) => {
-    if (bareServer.shouldRoute(req)) {
-        bareServer.routeUpgrade(req, socket, head);
-    } else {
-        socket.end();
-    }
+  if (bareServer.shouldRoute(req)) {
+    bareServer.routeUpgrade(req, socket, head);
+  } else {
+    socket.end();
+  }
 });
 
-server.on('listening', () => {
-    console.log(`Running at http://localhost:${PORT}`);
-});
-
-server.listen({
-    port: PORT,
+server.listen(PORT, () => {
+  console.log(`Running at http://localhost:${PORT}`);
 });
