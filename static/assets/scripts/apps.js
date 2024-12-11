@@ -294,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.style.color = 'white'
     btn.style.top = '-200px'
     btn.style.position = 'relative'
+    btn.style.visibility = 'hidden';
     btn.onclick = function () {
       setPin(pinNum)
     }
