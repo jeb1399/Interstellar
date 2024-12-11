@@ -31,6 +31,7 @@ const routes = [
     { path: '/0', file: 'tabs.html' },
     { path: '/1', file: 'go.html' },
     { path: '/2', file: 'other.html' },
+    { path: '/experiment', file: 'proxy.php' },
     { path: '/404', file: '404.html' },
 ];
 
