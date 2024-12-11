@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       name: 'SUPREM.IO',
       link: 'https://suprem.io/',
-      image: 'https://i.ibb.co/rpvB85Y/download.jpg',
+      image: '/assets/media/icons/supremio.jpg',
       categories: ['all'],
     },
     {
