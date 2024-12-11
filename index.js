@@ -1,10 +1,10 @@
-import express from 'express'
-import basicAuth from 'express-basic-auth'
-import http from 'node:http'
-import { createBareServer } from '@tomphttp/bare-server-node'
-import path from 'node:path'
-import cors from 'cors'
-import config from './config.js'
+import express from 'express';
+import basicAuth from 'express-basic-auth';
+import http from 'node:http';
+import { createBareServer } from '@tomphttp/bare-server-node';
+import path from 'node:path';
+import cors from 'cors';
+import config from './config.js';
 
 const __dirname = process.cwd();
 const server = http.createServer();
@@ -46,52 +46,30 @@ const fetchData = async (req, res, next, baseUrl) => {
             next();
         }
     } catch (error) {
-        console.error('Error fetching:', error);
         next(error);
     }
 };
 
-app.get('/y/*', cors({ origin: false }), (req, res, next) => {
-    const baseUrl = 'https://raw.githubusercontent.com/ypxa/y/main';
-    fetchData(req, res, next, baseUrl);
-});
+app.get('/y/*', cors({ origin: false }), (req, res, next) => fetchData(req, res, next, 'https://raw.githubusercontent.com/ypxa/y/main'));
 
-app.get('/f/*', cors({ origin: false }), (req, res, next) => {
-    const baseUrl = 'https://raw.githubusercontent.com/4x-a/x/fixy';
-    fetchData(req, res, next, baseUrl);
-});
+app.get('/f/*', cors({ origin: false }), (req, res, next) => fetchData(req, res, next, 'https://raw.githubusercontent.com/4x-a/x/fixy'));
 
-routes.forEach((route) => {
-    app.get(route.path, (req, res) => {
-        res.sendFile(path.join(__dirname, 'static', route.file));
-    });
+routes.forEach(route => {
+    app.get(route.path, (req, res) => res.sendFile(path.join(__dirname, 'static', route.file)));
 });
 
 app.get('/robots.txt', (req, res) => {
-    res.type('text/plain');
-    res.send('User-agent: *\nDisallow: /');
+    res.type('text/plain').send('User-agent: *\nDisallow: /');
 });
 
 server.on('request', (req, res) => {
-    if (bareServer.shouldRoute(req)) {
-        bareServer.routeRequest(req, res);
-    } else {
-        app(req, res);
-    }
+    bareServer.shouldRoute(req) ? bareServer.routeRequest(req, res) : app(req, res);
 });
 
 server.on('upgrade', (req, socket, head) => {
-    if (bareServer.shouldRoute(req)) {
-        bareServer.routeUpgrade(req, socket, head);
-    } else {
-        socket.end();
-    }
+    bareServer.shouldRoute(req) ? bareServer.routeUpgrade(req, socket, head) : socket.end();
 });
 
-server.on('listening', () => {
-    console.log(`Running at http://localhost:${PORT}`);
-});
+server.on('listening', () => console.log(`Running at http://localhost:${PORT}`));
 
-server.listen({
-    port: PORT,
-});
+server.listen({ port: PORT });
